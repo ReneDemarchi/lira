@@ -1,0 +1,11 @@
+{% load bs %}
+{% for e in form.non_field_errors %}<div class="alert alert-danger">{{ e }}</div>{% endfor %}
+{% for field in form.hidden_fields %}{{ field }}{% endfor %}
+{% for field in form.visible_fields %}
+  <div class="mb-3">
+    <label class="form-label"{% if field.id_for_label %} for="{{ field.id_for_label }}"{% endif %}>{{ field.label }}</label>
+    {{ field|bs }}
+    {% for e in field.errors %}<div class="invalid-feedback d-block">{{ e }}</div>{% endfor %}
+    {% if field.help_text %}<div class="form-text">{{ field.help_text|safe }}</div>{% endif %}
+  </div>
+{% endfor %}

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block title %}{{ projeto.nome }} · LIRA{% endblock %}
+{% block content %}
+<div class="mb-3">
+  <h1 class="h3 mb-1">{{ projeto.nome }}</h1>
+  {% if projeto.descricao %}<p class="text-body-secondary mb-0">{{ projeto.descricao|linebreaksbr }}</p>{% endif %}
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <h2 class="h5 mb-0">Board</h2>
+  {% if pode_gerenciar_tarefas %}
+    <a class="btn btn-primary btn-sm" href="{% url 'tarefa_nova' projeto.pk %}">Nova tarefa</a>
+  {% endif %}
+</div>
+<div class="row g-3 mb-4">
+  {% for valor, nome, tarefas in colunas %}
+    <section class="col-md-4">
+      <div class="bg-secondary-subtle rounded p-2 h-100">
+        <h3 class="h6 px-1 d-flex justify-content-between">{{ nome }} <span class="badge text-bg-secondary">{{ tarefas|length }}</span></h3>
+        {% for t in tarefas %}
+          <article class="card mb-2{% if t.atrasada %} border-danger{% endif %}">
+            <div class="card-body p-2">
+              <div class="fw-semibold mb-1">{{ t.titulo }}</div>
+              <div class="d-flex flex-wrap gap-1 mb-1">
+                <span class="badge {% if t.prioridade >= 4 %}text-bg-danger{% elif t.prioridade == 3 %}text-bg-warning{% else %}text-bg-light border{% endif %}">{{ t.get_prioridade_display }}</span>
+                {% for e in t.etiquetas.all %}<span class="badge text-bg-light border">{{ e }}</span>{% endfor %}
+                {% if t.atrasada %}<span class="badge text-bg-danger">Atrasada</span>{% endif %}
+              </div>
+              <small class="text-body-secondary d-block">
+                {{ t.responsavel|default:"Sem responsável" }}{% if t.data_limite %} · até {{ t.data_limite|date:"d/m" }}{% endif %}
+              </small>
+            </div>
+          </article>
+        {% empty %}
+          <p class="text-body-secondary small px-1 mb-0">Nenhuma tarefa.</p>
+        {% endfor %}
+      </div>
+    </section>
+  {% endfor %}
+</div>
+
+<h2 class="h5">Membros</h2>
+<ul class="list-group mb-3">
+  {% for p in participacoes %}
+    <li class="list-group-item d-flex justify-content-between align-items-center">
+      <span>{{ p.usuario }}{% if p.usuario == user %} <small>(você)</small>{% endif %}
+        <small class="text-body-secondary">{{ p.usuario.email }}</small></span>
+      <span class="badge text-bg-secondary">{{ p.get_papel_display }}</span>
+    </li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Nova tarefa · LIRA{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+  <nav class="mb-2"><a href="{% url 'projeto' projeto.pk %}">← {{ projeto.nome }}</a></nav>
+  <h1 class="h3 mb-3">Nova tarefa</h1>
+  <form method="post">{% csrf_token %}
+    {% include '_form.html' %}
+    <button class="btn btn-primary">Salvar</button>
+    <a class="btn btn-link" href="{% url 'projeto' projeto.pk %}">Cancelar</a>
+  </form>
+</div></div>
+{% endblock %}

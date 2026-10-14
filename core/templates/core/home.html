@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Meus projetos</h1>
+  <a class="btn btn-primary" href="{% url 'projeto_novo' %}">Novo projeto</a>
+</div>
+{% if participacoes %}
+  <div class="list-group">
+    {% for p in participacoes %}
+      <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-start" href="{% url 'projeto' p.projeto.pk %}">
+        <div>
+          <div class="fw-semibold">{{ p.projeto.nome }}</div>
+          {% if p.projeto.descricao %}<small class="text-body-secondary">{{ p.projeto.descricao|truncatechars:120 }}</small>{% endif %}
+        </div>
+        <span class="badge text-bg-secondary">{{ p.get_papel_display }}</span>
+      </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-body-secondary">Você ainda não participa de nenhum projeto. Crie um ou peça para um Administrador te adicionar.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends '_auth_card.html' %}
+{% block title %}Cadastro · LIRA{% endblock %}
+{% block card %}
+<h1 class="h4 mb-3">Criar conta</h1>
+<form method="post">{% csrf_token %}
+  {% include '_form.html' %}
+  <button class="btn btn-primary w-100">Cadastrar</button>
+</form>
+<p class="mt-3 mb-0 text-center">Já tem conta? <a href="{% url 'login' %}">Entrar</a></p>
+{% endblock %}
