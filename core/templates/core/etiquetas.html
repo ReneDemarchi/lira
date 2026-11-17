@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load bs %}
+{% block title %}Etiquetas · {{ projeto.nome }} · LIRA{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-6">
+  <nav class="mb-2"><a href="{% url 'projeto' projeto.pk %}">← {{ projeto.nome }}</a></nav>
+  <h1 class="h3 mb-3">Etiquetas</h1>
+  <ul class="list-group mb-3">
+    {% for e in etiquetas %}
+      <li class="list-group-item d-flex gap-2">
+        <form method="post" class="d-flex gap-2 flex-grow-1">{% csrf_token %}
+          <input type="hidden" name="id" value="{{ e.pk }}">
+          <input name="nome" value="{{ e.nome }}" maxlength="40" required class="form-control form-control-sm" aria-label="Nome da etiqueta">
+          <button class="btn btn-sm btn-outline-secondary">Renomear</button>
+        </form>
+        <form method="post" onsubmit="return confirm('Excluir a etiqueta {{ e.nome|escapejs }}? Ela sai de todas as tarefas.')">{% csrf_token %}
+          <input type="hidden" name="id" value="{{ e.pk }}"><input type="hidden" name="acao" value="excluir">
+          <button class="btn btn-sm btn-outline-danger">Excluir</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="list-group-item text-body-secondary">Nenhuma etiqueta.</li>
+    {% endfor %}
+  </ul>
+  <form method="post" class="d-flex gap-2 align-items-start" novalidate>{% csrf_token %}
+    <div class="flex-grow-1">
+      {{ form.nome|bs }}
+      {% for e in form.nome.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+    </div>
+    <button class="btn btn-primary">Criar etiqueta</button>
+  </form>
+</div></div>
+{% endblock %}

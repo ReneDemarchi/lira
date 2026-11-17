@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Excluir {{ projeto.nome }} · LIRA{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-6">
+  <h1 class="h3 mb-3">Excluir projeto</h1>
+  <div class="alert alert-danger">
+    Isto apaga <strong>{{ projeto.nome }}</strong> com todas as tarefas, comentários, etiquetas e membros. Não dá para desfazer.
+  </div>
+  <form method="post">{% csrf_token %}
+    {% include '_form.html' %}
+    <button class="btn btn-danger">Excluir definitivamente</button>
+    <a class="btn btn-link" href="{% url 'projeto' projeto.pk %}">Cancelar</a>
+  </form>
+</div></div>
+{% endblock %}

@@ -31,3 +31,7 @@ def exigir(usuario, projeto_pk, regra=None):
 def pode_gerenciar_tarefas(p):
     """RN04 e RF08: criar, editar, excluir e atribuir Tarefas; criar e editar Etiquetas."""
     return p in (Papel.ADMIN, Papel.COORD)
+
+
+def pode_gerenciar_projeto(p):
+    return p == Papel.ADMIN

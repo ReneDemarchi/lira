@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}Novo projeto · LIRA{% endblock %}
+{% block title %}{% if projeto %}Editar{% else %}Novo{% endif %} projeto · LIRA{% endblock %}
 {% block content %}
 <div class="row justify-content-center"><div class="col-lg-6">
-  <h1 class="h3 mb-3">Novo projeto</h1>
+  <h1 class="h3 mb-3">{% if projeto %}Editar projeto{% else %}Novo projeto{% endif %}</h1>
   <form method="post">{% csrf_token %}
     {% include '_form.html' %}
     <button class="btn btn-primary">Salvar</button>
-    <a class="btn btn-link" href="{% url 'home' %}">Cancelar</a>
+    <a class="btn btn-link" href="{% if projeto %}{% url 'projeto' projeto.pk %}{% else %}{% url 'home' %}{% endif %}">Cancelar</a>
   </form>
 </div></div>
 {% endblock %}

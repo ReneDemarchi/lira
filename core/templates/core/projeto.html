@@ -1,15 +1,27 @@
 {% extends 'base.html' %}
+{% load bs %}
 {% block title %}{{ projeto.nome }} · LIRA{% endblock %}
 {% block content %}
-<div class="mb-3">
-  <h1 class="h3 mb-1">{{ projeto.nome }}</h1>
-  {% if projeto.descricao %}<p class="text-body-secondary mb-0">{{ projeto.descricao|linebreaksbr }}</p>{% endif %}
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h3 mb-1">{{ projeto.nome }}</h1>
+    {% if projeto.descricao %}<p class="text-body-secondary mb-0">{{ projeto.descricao|linebreaksbr }}</p>{% endif %}
+  </div>
+  {% if pode_gerenciar %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'projeto_editar' projeto.pk %}">Editar</a>
+      <a class="btn btn-outline-danger btn-sm" href="{% url 'projeto_excluir' projeto.pk %}">Excluir</a>
+    </div>
+  {% endif %}
 </div>
 
 <div class="d-flex justify-content-between align-items-center mb-2">
   <h2 class="h5 mb-0">Board</h2>
   {% if pode_gerenciar_tarefas %}
-    <a class="btn btn-primary btn-sm" href="{% url 'tarefa_nova' projeto.pk %}">Nova tarefa</a>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'etiquetas' projeto.pk %}">Etiquetas</a>
+      <a class="btn btn-primary btn-sm" href="{% url 'tarefa_nova' projeto.pk %}">Nova tarefa</a>
+    </div>
   {% endif %}
 </div>
 <div class="row g-3 mb-4">
@@ -20,7 +32,7 @@
         {% for t in tarefas %}
           <article class="card mb-2{% if t.atrasada %} border-danger{% endif %}">
             <div class="card-body p-2">
-              <div class="fw-semibold mb-1">{{ t.titulo }}</div>
+              <a class="fw-semibold d-block mb-1" href="{% url 'tarefa' projeto.pk t.pk %}">{{ t.titulo }}</a>
               <div class="d-flex flex-wrap gap-1 mb-1">
                 <span class="badge {% if t.prioridade >= 4 %}text-bg-danger{% elif t.prioridade == 3 %}text-bg-warning{% else %}text-bg-light border{% endif %}">{{ t.get_prioridade_display }}</span>
                 {% for e in t.etiquetas.all %}<span class="badge text-bg-light border">{{ e }}</span>{% endfor %}
@@ -42,11 +54,36 @@
 <h2 class="h5">Membros</h2>
 <ul class="list-group mb-3">
   {% for p in participacoes %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
+    <li class="list-group-item d-flex flex-wrap justify-content-between align-items-center gap-2">
       <span>{{ p.usuario }}{% if p.usuario == user %} <small>(você)</small>{% endif %}
         <small class="text-body-secondary">{{ p.usuario.email }}</small></span>
-      <span class="badge text-bg-secondary">{{ p.get_papel_display }}</span>
+      {% if pode_gerenciar %}
+        <div class="d-flex gap-2">
+          <form method="post" action="{% url 'membro_papel' projeto.pk p.pk %}" class="d-flex gap-2">{% csrf_token %}
+            <select name="papel" class="form-select form-select-sm" aria-label="Papel de {{ p.usuario }}">
+              {% for valor, nome in papeis %}<option value="{{ valor }}"{% if valor == p.papel %} selected{% endif %}>{{ nome }}</option>{% endfor %}
+            </select>
+            <button class="btn btn-sm btn-outline-secondary">Alterar</button>
+          </form>
+          <form method="post" action="{% url 'membro_remover' projeto.pk p.pk %}"
+                onsubmit="return confirm('Remover {{ p.usuario|escapejs }} do projeto? As tarefas dele ficarão sem responsável.')">{% csrf_token %}
+            <button class="btn btn-sm btn-outline-danger">Remover</button>
+          </form>
+        </div>
+      {% else %}
+        <span class="badge text-bg-secondary">{{ p.get_papel_display }}</span>
+      {% endif %}
     </li>
   {% endfor %}
 </ul>
+{% if pode_gerenciar %}
+  <form method="post" action="{% url 'membro_adicionar' projeto.pk %}" class="row g-2 align-items-start mb-4" novalidate>{% csrf_token %}
+    <div class="col-sm-6">
+      {{ form_membro.email|bs }}
+      {% for e in form_membro.email.errors %}<div class="invalid-feedback">{{ e }}</div>{% endfor %}
+    </div>
+    <div class="col-sm-3">{{ form_membro.papel|bs }}</div>
+    <div class="col-sm-3"><button class="btn btn-primary w-100">Adicionar membro</button></div>
+  </form>
+{% endif %}
 {% endblock %}

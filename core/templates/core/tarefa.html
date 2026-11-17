@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}{{ tarefa.titulo }} · LIRA{% endblock %}
+{% block content %}
+<nav class="mb-2"><a href="{% url 'projeto' projeto.pk %}">← {{ projeto.nome }}</a></nav>
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <h1 class="h3 mb-0">{{ tarefa.titulo }}</h1>
+  {% if pode_gerenciar_tarefas %}
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary btn-sm" href="{% url 'tarefa_editar' projeto.pk tarefa.pk %}">Editar</a>
+      <form method="post" action="{% url 'tarefa_excluir' projeto.pk tarefa.pk %}"
+            onsubmit="return confirm('Excluir esta tarefa?')">{% csrf_token %}
+        <button class="btn btn-outline-danger btn-sm">Excluir</button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+<div class="card mb-4"><div class="card-body">
+  <dl class="row mb-0">
+    <dt class="col-sm-3">Estado</dt>
+    <dd class="col-sm-9">
+      {{ tarefa.get_estado_display }}
+    </dd>
+    <dt class="col-sm-3">Prioridade</dt><dd class="col-sm-9">{{ tarefa.get_prioridade_display }}</dd>
+    <dt class="col-sm-3">Responsável</dt><dd class="col-sm-9">{{ tarefa.responsavel|default:"—" }}</dd>
+    <dt class="col-sm-3">Data limite</dt>
+    <dd class="col-sm-9">{{ tarefa.data_limite|date:"d/m/Y"|default:"—" }}{% if tarefa.atrasada %} <span class="badge text-bg-danger">Atrasada</span>{% endif %}</dd>
+    <dt class="col-sm-3">Etiquetas</dt>
+    <dd class="col-sm-9">{% for e in tarefa.etiquetas.all %}<span class="badge text-bg-light border me-1">{{ e }}</span>{% empty %}—{% endfor %}</dd>
+  </dl>
+  {% if tarefa.descricao %}<hr><p class="mb-0">{{ tarefa.descricao|linebreaksbr }}</p>{% endif %}
+</div></div>
+
+{% endblock %}
